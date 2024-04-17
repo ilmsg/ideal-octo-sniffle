@@ -7,6 +7,9 @@ import (
 	"log"
 
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/template/html/v2"
+
 	"github.com/ilmsg/ideal-octo-sniffle/config"
 	"github.com/ilmsg/ideal-octo-sniffle/database"
 	"github.com/ilmsg/ideal-octo-sniffle/ideal"
@@ -74,5 +77,51 @@ func run() error {
 		fmt.Printf("Store{id=%d,title=%s,description=%s,userId=%d}\n", store.ID, store.Title, store.Description, store.Userid)
 	}
 
-	return nil
+	engine := html.New("./views", ".html")
+	app := fiber.New(fiber.Config{
+		Views:       engine,
+		ViewsLayout: "layouts/main",
+	})
+
+	app.Get("/", func(c *fiber.Ctx) error {
+		user, err := queries.GetUser(ctx, 1)
+		if err != nil {
+			return err
+		}
+
+		return c.Render("index", fiber.Map{
+			"Title":    "Hello, World!",
+			"Id":       user.ID,
+			"Email":    user.Email,
+			"Password": user.Password,
+		})
+	})
+
+	app.Get("/users", func(c *fiber.Ctx) error {
+		users, err := queries.ListUsers(context.Background())
+		if err != nil {
+			return err
+		}
+
+		return c.Render("users/index", fiber.Map{
+			"Title": "Users",
+			"Users": users,
+		})
+	})
+
+	app.Get("/stores", func(c *fiber.Ctx) error {
+		stores, err := queries.ListStores(context.Background())
+		if err != nil {
+			return err
+		}
+
+		println(stores)
+		return c.Render("stores/index", fiber.Map{
+			"Title":  "Stores",
+			"Stores": stores,
+		})
+	})
+
+	return app.Listen(":3010")
+	// return nil
 }

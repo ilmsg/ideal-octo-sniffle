@@ -1,0 +1,22 @@
+<div class="container">
+    <h1 class="mt-5">Store Lists</h1>
+
+    <table class="table table-striped table-bordered">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Title</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{range .Stores}}
+            <tr>
+                <td>{{.ID}}</td>
+                <td>{{.Title}}</td>
+                <td>{{.Description}}</td>
+            </tr>
+            {{end}}
+        </tbody>
+    </table>
+</div>
